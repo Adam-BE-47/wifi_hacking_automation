@@ -299,7 +299,7 @@ def help():
     print("---------------------------------------------------------------------------------------------------------------------------")
     print("- start -  to kill the conflicting processes and to put the chosen adapter on monitor mode")
     print("- scan - to scan for the wifi in the perimeter")
-    print("- Use - target <wifi's number> - - to choose/change the wifi that we will perform the attack on")
+    print("- target - to choose/change the wifi that we will perform the attack on")
     print("- target device - to choose the devices connected to the target that you want to aim at")
     print("- show target - to display the chosen target")
     print("- show target device - to display the list of the devices that will be used for the precise attack")
